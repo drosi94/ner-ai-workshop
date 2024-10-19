@@ -1,14 +1,25 @@
 'use server';
 
+import { UnstructuredLoader } from '@langchain/community/document_loaders/fs/unstructured';
 import { ChatOpenAI } from '@langchain/openai';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
-import { jsonSchemaToZod } from 'json-schema-to-zod';
 
-export async function extractNER(prompt: string, schema: string) {
-  const parsedSchema = JSON.parse(schema) as Record<string, string>;
+export async function extractNER(formData: FormData) {
+  const userPrompt = formData.get('prompt') as string;
+  const userSchema = formData.get('schema') as string;
+  const userFiles = formData.getAll('file') as File[];
 
-  // biome-ignore lint/security/noGlobalEval: <explanation>
-  const zodSchema = eval(jsonSchemaToZod(parsedSchema, { module: 'cjs' }));
+  const userParsedSchema = JSON.parse(userSchema) as Record<string, string>;
+
+  const schema = {
+    type: 'object',
+    properties: {
+      entities: {
+        type: 'array',
+        items: userParsedSchema,
+      },
+    },
+  };
 
   const template = `
       You are a smart and intelligent Named Entity Recognition (NER) system. Your task is to extract named entities from the following Input according to the given prompt and schema:
@@ -17,8 +28,7 @@ export async function extractNER(prompt: string, schema: string) {
 
       Input: {context}
 
-      Provide the output in valid JSON format that matches the given schema.
-      If you cannot find any entity, please return an empty array.
+      Provide the output in valid JSON format that matches the given schema and always according to the prompt given above.
     `;
 
   const promptTemplate = ChatPromptTemplate.fromTemplate(template);
@@ -28,13 +38,39 @@ export async function extractNER(prompt: string, schema: string) {
     temperature: 0,
     maxRetries: 6,
     apiKey: process.env.OPENAI_API_KEY,
-  }).withStructuredOutput(zodSchema);
+  }).withStructuredOutput(schema, {
+    method: 'jsonSchema',
+  });
 
   const chain = promptTemplate.pipe(model);
 
+  const filesToBlob = userFiles.map((file) => new Blob([file]));
+
+  const filesContents = await Promise.all(
+    filesToBlob.map(async (blob, index) => {
+      const loader = new UnstructuredLoader(
+        {
+          fileName: userFiles[index].name,
+          buffer: Buffer.from(await blob.arrayBuffer()),
+        },
+        {
+          apiUrl: 'https://api.unstructuredapp.io/general/v0/general',
+          apiKey: process.env.UNSTRUCTURED_API_KEY,
+          ocrLanguages: ['el', 'en'],
+          strategy: userFiles[index].type === 'application/pdf' ? 'fast' : 'auto',
+        },
+      );
+
+      const documents = await loader.load();
+
+      // join all the text from the documents
+      return documents.map((doc) => doc.pageContent).join('');
+    }),
+  );
+
   const result = await chain.invoke({
-    prompt,
-    context: 'The cat name is tom and the mouse name is jerry',
+    prompt: userPrompt,
+    context: filesContents.join('\n\n'),
   });
 
   console.log(result);

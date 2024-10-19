@@ -1,93 +1,58 @@
 'use client';
 
-import type React from 'react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { useToast } from '@/hooks/use-toast';
 import dynamic from 'next/dynamic';
 import locale from 'react-json-editor-ajrm/locale/en';
-import { extractNER } from '@/app/actions/ner/extractNER';
+import { defaultPromptTemplate, defaultSchemaJSON } from '@/lib/constants';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
 
 const JSONEditor = dynamic(() => import('react-json-editor-ajrm').then((mod) => mod.default), { ssr: false });
+const editorStyles = {
+  background: 'transparent',
+  default: '#d4d4d4',
+  string: '#ce9178',
+  number: '#b5cea8',
+  colon: '#d4d4d4',
+  keys: '#9cdcfe',
+  keys_whiteSpace: '#af99c4',
+  primitive: '#569cd6',
+};
 
-const NERExtraction: React.FC = () => {
-  const [prompt, setPrompt] = useState('Extract the mouseName and the catName from the context');
-  const [schema, setSchema] = useState({
-    type: 'object',
-    properties: {
-      mouseName: {
-        type: 'string',
-      },
-      catName: {
-        type: 'string',
-      },
-    },
-  });
-  const [result, setResult] = useState({});
-  const { toast } = useToast();
+type Props = Readonly<{
+  result?: Record<string, unknown>;
+}>;
 
-  const handleExtraction = async () => {
-    try {
-      const data = await extractNER(prompt, JSON.stringify(schema, null, 2));
-      setResult(data);
-    } catch (error) {
-      toast({
-        title: 'Error processing NER extraction',
-        description: (error as Error).message,
-        variant: 'destructive',
-      });
-    }
-  };
+function NERExtraction(props: Props) {
+  const { result } = props;
+
+  const [prompt, setPrompt] = useState(defaultPromptTemplate);
+  const [schema, setSchema] = useState<Record<string, unknown>>(defaultSchemaJSON);
 
   return (
     <div className="space-y-4">
-      <Textarea placeholder="Enter NER extraction prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} className="min-h-[100px]" />
+      <Textarea name="prompt" placeholder="Enter NER extraction prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} className="min-h-[100px]" />
       <div className="border rounded-md p-2">
+        <input type="hidden" name="schema" value={JSON.stringify(schema)} />
         <JSONEditor
           placeholder={schema}
-          onChange={(value: { jsObject: any }) => setSchema(value.jsObject)}
+          onChange={(value: { jsObject: Record<string, unknown> }) => setSchema(value.jsObject)}
           locale={locale}
           height="200px"
           width="100%"
-          colors={{
-            background: 'transparent',
-            default: '#d4d4d4',
-            string: '#ce9178',
-            number: '#b5cea8',
-            colon: '#d4d4d4',
-            keys: '#9cdcfe',
-            keys_whiteSpace: '#af99c4',
-            primitive: '#569cd6',
-          }}
+          colors={editorStyles}
         />
       </div>
-      <Button onClick={handleExtraction} className="w-full">
+      <Button type="submit" className="w-full">
         Process NER Extraction
       </Button>
       {Object.keys(result ?? {}).length > 0 ? (
         <div className="mt-8">
-          <JSONEditor
-            viewOnly
-            placeholder={result}
-            locale={locale}
-            height="200px"
-            width="100%"
-            colors={{
-              background: 'transparent',
-              default: '#d4d4d4',
-              string: '#ce9178',
-              number: '#b5cea8',
-              colon: '#d4d4d4',
-              keys: '#9cdcfe',
-              keys_whiteSpace: '#af99c4',
-              primitive: '#569cd6',
-            }}
-          />
+          <JSONEditor viewOnly placeholder={result} locale={locale} height="200px" width="100%" colors={editorStyles} />
         </div>
       ) : null}
     </div>
   );
-};
+}
 
 export default NERExtraction;

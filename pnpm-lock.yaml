@@ -128,9 +128,6 @@ importers:
       '@uppy/file-input':
         specifier: ^4.0.1
         version: 4.0.2(@uppy/core@4.2.2)
-      '@uppy/golden-retriever':
-        specifier: ^4.0.0
-        version: 4.0.0(@uppy/core@4.2.2)
       '@uppy/image-editor':
         specifier: ^3.1.0
         version: 3.1.0(@uppy/core@4.2.2)
@@ -1779,11 +1776,6 @@ packages:
     resolution: {integrity: sha512-vZ6576Hyum7BYvIc+KCrsp/qPDsS/+qP4d7g8FC5Da8r0BPsNke95T3pqdr9uQiNGPOAG+etw9UvnnTo93zxqg==}
     peerDependencies:
       '@uppy/core': ^4.2.2
-
-  '@uppy/golden-retriever@4.0.0':
-    resolution: {integrity: sha512-oFq0MHWDwTvX2MZpa8bR81hwXwU2Ri4cn1DLo70dGaQ3Aa2Fkv4Gie8sFlqaO4wv5vIWVGG8FHQW7FvfFxhaIw==}
-    peerDependencies:
-      '@uppy/core': ^4.0.0
 
   '@uppy/image-editor@3.1.0':
     resolution: {integrity: sha512-Ijgn18td1yR9YeZbEbmdRq8e7ZcYoRunGjgkl/O9milHFHYVkt6F5o1sVgP0I7WczYWKtWha9mbhV6HJF5LUjg==}
@@ -5102,12 +5094,6 @@ snapshots:
       '@uppy/core': 4.2.2
       '@uppy/utils': 6.0.3
       preact: 10.24.3
-
-  '@uppy/golden-retriever@4.0.0(@uppy/core@4.2.2)':
-    dependencies:
-      '@uppy/core': 4.2.2
-      '@uppy/utils': 6.0.3
-      lodash: 4.17.21
 
   '@uppy/image-editor@3.1.0(@uppy/core@4.2.2)':
     dependencies:

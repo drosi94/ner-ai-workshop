@@ -53,7 +53,6 @@
     "@uppy/dashboard": "^4.1.0",
     "@uppy/drag-drop": "^4.0.2",
     "@uppy/file-input": "^4.0.1",
-    "@uppy/golden-retriever": "^4.0.0",
     "@uppy/image-editor": "^3.1.0",
     "@uppy/locales": "^4.1.0",
     "@uppy/progress-bar": "^4.0.0",
@@ -69,7 +68,6 @@
     "eslint": "8.49.0",
     "eslint-config-next": "14.2.15",
     "input-otp": "^1.2.4",
-    "json-schema-to-zod": "^2.4.1",
     "langchain": "0.3.2",
     "langsmith": "0.1.65",
     "lucide-react": "^0.446.0",
@@ -89,8 +87,7 @@
     "tailwindcss": "3.3.3",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "5.2.2",
-    "vaul": "^0.9.9",
-    "zod": "^3.23.8"
+    "vaul": "^0.9.9"
   },
   "devDependencies": {
     "@types/react-json-editor-ajrm": "^2.5.6"
