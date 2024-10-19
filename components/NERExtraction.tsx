@@ -21,20 +21,29 @@ const editorStyles = {
 
 type Props = Readonly<{
   result?: Record<string, unknown>;
+  isLoading?: boolean;
 }>;
 
 function NERExtraction(props: Props) {
-  const { result } = props;
+  const { result, isLoading = false } = props;
 
   const [prompt, setPrompt] = useState(defaultPromptTemplate);
   const [schema, setSchema] = useState<Record<string, unknown>>(defaultSchemaJSON);
 
   return (
     <div className="space-y-4">
-      <Textarea name="prompt" placeholder="Enter NER extraction prompt" value={prompt} onChange={(e) => setPrompt(e.target.value)} className="min-h-[100px]" />
+      <Textarea
+        name="prompt"
+        placeholder="Enter NER extraction prompt"
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        className="min-h-[100px]"
+        disabled={isLoading}
+      />
       <div className="border rounded-md p-2">
         <input type="hidden" name="schema" value={JSON.stringify(schema)} />
         <JSONEditor
+          viewOnly={isLoading}
           placeholder={schema}
           onChange={(value: { jsObject: Record<string, unknown> }) => setSchema(value.jsObject)}
           locale={locale}
@@ -43,8 +52,8 @@ function NERExtraction(props: Props) {
           colors={editorStyles}
         />
       </div>
-      <Button type="submit" className="w-full">
-        Process NER Extraction
+      <Button disabled={isLoading} type="submit" className="w-full disabled:opacity-40">
+        {isLoading ? 'Extracting entities...' : 'Extract entities'}
       </Button>
       {Object.keys(result ?? {}).length > 0 ? (
         <div className="mt-8">

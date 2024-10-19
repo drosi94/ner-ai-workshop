@@ -51,7 +51,7 @@ export function AppClient() {
       </div>
       <div>
         <h2 className="text-2xl font-semibold mb-4">NER Extraction</h2>
-        <NERExtraction result={result} />
+        <NERExtraction result={result} isLoading={isLoading} />
       </div>
     </form>
   );

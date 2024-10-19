@@ -28,7 +28,7 @@ export async function extractNER(formData: FormData) {
 
       Input: {context}
 
-      Provide the output in valid JSON format that matches the given schema and always according to the prompt given above.
+      Provide the output in valid JSON format that matches the given schema and always according to the prompt given above. NEVER extract entities from the prompt or the examples, only from the input text given as context. If you cannot find any entity, please return an empty array.
     `;
 
   const promptTemplate = ChatPromptTemplate.fromTemplate(template);
@@ -68,11 +68,13 @@ export async function extractNER(formData: FormData) {
     }),
   );
 
+  console.log('STARTED EXTRACTION');
   const result = await chain.invoke({
     prompt: userPrompt,
     context: filesContents.join('\n\n'),
   });
 
+  console.log('FINISHED EXTRACTION');
   console.log(result);
 
   return result;
