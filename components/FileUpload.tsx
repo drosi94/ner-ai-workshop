@@ -2,7 +2,6 @@
 
 import Compressor from '@uppy/compressor';
 import Uppy from '@uppy/core';
-import GoldenRetriever from '@uppy/golden-retriever';
 import ImageEditor from '@uppy/image-editor';
 import { Dashboard, useUppyEvent } from '@uppy/react';
 import Webcam from '@uppy/webcam';
